@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
@@ -55,82 +56,66 @@ void printInfoHeader(BITMAPINFOHEADER bitmapInfoHeader){
 }
 
 typedef struct Pixel{
-    unsigned int b;
-    unsigned int g;
-    unsigned int r;
+    unsigned char b;
+    unsigned char g;
+    unsigned char r;
 } PIXEL;
 
 void printHist(char* colour, int* arr, int pxcount){
     printf("%s:\n", colour);
     int i = 0;
     float tmp = 100*(float)arr[i]/pxcount;
-    printf("    0-15: %.2f%%\n", tmp);
+    printf("\t0-15: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    16-31: %.2f%%\n", tmp);
+    printf("\t16-31: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    32-47: %.2f%%\n", tmp);
+    printf("\t32-47: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    48-63: %.2f%%\n", tmp);
+    printf("\t48-63: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    64-79: %.2f%%\n", tmp);
+    printf("\t64-79: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    80-95: %.2f%%\n", tmp);
+    printf("\t80-95: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    96-111: %.2f%%\n", tmp);
+    printf("\t96-111: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    112-127: %.2f%%\n", tmp);
+    printf("\t112-127: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    128-143: %.2f%%\n", tmp);
+    printf("\t128-143: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    144-159: %.2f%%\n", tmp);
+    printf("\t144-159: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    160-175: %.2f%%\n", tmp);
+    printf("\t160-175: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    176-191: %.2f%%\n", tmp);
+    printf("\t176-191: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    192-207: %.2f%%\n", tmp);
+    printf("\t192-207: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    208-223: %.2f%%\n", tmp);
+    printf("\t208-223: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    224-239: %.2f%%\n", tmp);
+    printf("\t224-239: %.2f%%\n", tmp);
     i++;
     tmp = 100*(float)arr[i]/pxcount;
-    printf("    240-255: %.2f%%\n", tmp);
-}
-
-void printSumPerc(int* red, int* green, int* blue, int pxcount){
-    float sumB = 0;
-    float sumG = 0;
-    float sumR = 0;
-    float tmp;
-    for (int i=0; i<=15; i++){
-        tmp = 100*(float)red[i]/pxcount;
-        sumR+=tmp;
-        tmp = 100*(float)green[i]/pxcount;
-        sumG+=tmp;
-        tmp = 100*(float)blue[i]/pxcount;
-        sumB+=tmp;
-    }
-    printf("sumR: %f, sumG: %f, sumB: %f\n", sumR, sumG, sumB);
+    printf("\t240-255: %.2f%%\n", tmp);
 }
 
 int main(int argc, char* argv[]){
-    BITMAPFILEHEADER bitmapFileHeader; //our bitmap file header
-    BITMAPINFOHEADER bitmapInfoHeader;
+    BITMAPFILEHEADER bitmapFileHeader; //bitmap file header
+    BITMAPINFOHEADER bitmapInfoHeader; //bitmap info header
 
     // Open the file for Reading and validate it
     FILE *bmpfile;
@@ -142,26 +127,26 @@ int main(int argc, char* argv[]){
 
     // Open the file for Writing and validate it
     FILE *out;
-    int outopen=1;
+    bool outopen = true;
     if (( out = fopen (argv[2], "wb")) == NULL) {
         printf("error: failed to open output file ('%s')\n", argv[2]);
-        outopen=0;
+        outopen = false;
     }
 
-    // Write the bitmap file header and info header
+    // Copy the header to Output
     unsigned char header[54];
     fread(header, sizeof(unsigned char), 54, bmpfile);
     fwrite(header, sizeof(unsigned char), 54, out);
     fseek(bmpfile, 0, SEEK_SET);
 
-    // Read the bitmap file header
+    // Read the bitmap File header
     fread(&bitmapFileHeader.bfType, 2, 1, bmpfile);
     fread(&bitmapFileHeader.bfSize, 4, 1, bmpfile);
     fread(&bitmapFileHeader.bfReserved1, 2, 1, bmpfile);
     fread(&bitmapFileHeader.bfReserved2, 2, 1, bmpfile);
     fread(&bitmapFileHeader.bfOffBits, 4, 1, bmpfile);
 
-    // Read the bitmap info header
+    // Read the bitmap Info header
     fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, bmpfile);
 
     // Print header information
@@ -170,13 +155,17 @@ int main(int argc, char* argv[]){
 
     if (bitmapInfoHeader.biBitCount!=24 || bitmapInfoHeader.biCompression!=0){
         printf("Histogram calculation is unsupported.\n");
+        fclose(bmpfile);
+        if (outopen == true){
+            fclose(out);
+        }
         return 0;
     }
 
     PIXEL im[bitmapInfoHeader.biHeight][bitmapInfoHeader.biWidth];
     PIXEL gray;
     
-    int pxcount=0;
+    int pxcount = 0;
     int red[16] = {0};
     int green[16] = {0};
     int blue[16] = {0};
