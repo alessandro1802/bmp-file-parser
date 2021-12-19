@@ -174,29 +174,20 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-    // colour = [(0-15), (16-31), (32-63)...] 
+    PIXEL im[bitmapInfoHeader.biHeight][bitmapInfoHeader.biWidth];
+    PIXEL gray;
+    
+    int pxcount=0;
     int red[16] = {0};
     int green[16] = {0};
     int blue[16] = {0};
-
-    int pxcount=0;
-    //double rowsize = floor((bitmapInfoHeader.biBitCount*bitmapInfoHeader.biWidth+31)/32)*4;
-
-    PIXEL im[bitmapInfoHeader.biHeight][bitmapInfoHeader.biWidth];
-    PIXEL gray;
     int i, j;
-    //for (i = bitmapInfoHeader.biHeight-1; i >= 0; i--) {
     for (i = 0; i <= bitmapInfoHeader.biHeight; i++) {
         for (j = 0; j < bitmapInfoHeader.biWidth; j++) {
             fread(&im[i][j], sizeof(unsigned char), sizeof(PIXEL), bmpfile);
             pxcount++;
-            //printf("%d %d %d ", im[i][j].r, im[i][j].g, im[i][j].b);
-            // Calculate gray pixel value and write it to the file
 
-            /*char g = im[i][j].r * 1/3 + im[i][j].g * 1/3 + im[i][j].b * 1/3;
-            gray.r=g;
-            gray.g=g;
-            gray.b=g;*/
+            // Calculate gray pixel value and write it to the file
             gray.r=im[i][j].r * 1/3 + im[i][j].g * 1/3 + im[i][j].b * 1/3;
             gray.g=im[i][j].r * 1/3 + im[i][j].g * 1/3 + im[i][j].b * 1/3;
             gray.b=im[i][j].r * 1/3 + im[i][j].g * 1/3 + im[i][j].b * 1/3;
@@ -351,15 +342,11 @@ int main(int argc, char* argv[]){
             }
             
         }
-        //printf("\n");
     }
-    // 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256
 
     printHist("\nRed", red, pxcount);
     printHist("Green", green, pxcount);
     printHist("Blue", blue, pxcount);
-
-    //printSumPerc(red, green, blue, pxcount);
 
     fclose(bmpfile);
     if (outopen==1){
