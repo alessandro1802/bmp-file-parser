@@ -32,32 +32,32 @@ typedef struct tagBITMAPINFOHEADER {
 
 void printFileHeader(BITMAPFILEHEADER bitmapFileHeader){
     printf("BITMAPFILEHEADER\n");
-    printf("    bfType: 0x%x\n", bitmapFileHeader.bfType);
-    printf("    bfSize: %d\n", bitmapFileHeader.bfSize);
-    printf("    bfReserved1: 0x%x\n", bitmapFileHeader.bfReserved1);
-    printf("    bfReserved2: 0x%x\n", bitmapFileHeader.bfReserved2);
-    printf("    bfOffBits: %d\n", bitmapFileHeader.bfOffBits);
+    printf("\tbfType: 0x%x\n", bitmapFileHeader.bfType);
+    printf("\tbfSize: %d\n", bitmapFileHeader.bfSize);
+    printf("\tbfReserved1: 0x%x\n", bitmapFileHeader.bfReserved1);
+    printf("\tbfReserved2: 0x%x\n", bitmapFileHeader.bfReserved2);
+    printf("\tbfOffBits: %d\n", bitmapFileHeader.bfOffBits);
 }
 
 void printInfoHeader(BITMAPINFOHEADER bitmapInfoHeader){
     printf("BITMAPINFOHEADER\n");
-    printf("    biSize: %d\n", bitmapInfoHeader.biSize);
-    printf("    biWidth: %d\n", bitmapInfoHeader.biWidth);
-    printf("    biHeight: %d\n", bitmapInfoHeader.biHeight);
-    printf("    biPlanes: %d\n", bitmapInfoHeader.biPlanes);
-    printf("    biBitCount: %d\n", bitmapInfoHeader.biBitCount);
-    printf("    biCompression: %d\n", bitmapInfoHeader.biCompression);
-    printf("    biSizeImage: %d\n", bitmapInfoHeader.biSizeImage);
-    printf("    biXPelsPerMeter: %d\n", bitmapInfoHeader.biXPelsPerMeter);
-    printf("    biYPelsPerMeter: %d\n", bitmapInfoHeader.biYPelsPerMeter);
-    printf("    biClrUsed: %d\n", bitmapInfoHeader.biClrUsed);
-    printf("    biClrImportant: %d\n", bitmapInfoHeader.biClrImportant);
+    printf("\tbiSize: %d\n", bitmapInfoHeader.biSize);
+    printf("\tbiWidth: %d\n", bitmapInfoHeader.biWidth);
+    printf("\tbiHeight: %d\n", bitmapInfoHeader.biHeight);
+    printf("\tbiPlanes: %d\n", bitmapInfoHeader.biPlanes);
+    printf("\tbiBitCount: %d\n", bitmapInfoHeader.biBitCount);
+    printf("\tbiCompression: %d\n", bitmapInfoHeader.biCompression);
+    printf("\tbiSizeImage: %d\n", bitmapInfoHeader.biSizeImage);
+    printf("\tbiXPelsPerMeter: %d\n", bitmapInfoHeader.biXPelsPerMeter);
+    printf("\tbiYPelsPerMeter: %d\n", bitmapInfoHeader.biYPelsPerMeter);
+    printf("\tbiClrUsed: %d\n", bitmapInfoHeader.biClrUsed);
+    printf("\tbiClrImportant: %d\n", bitmapInfoHeader.biClrImportant);
 }
 
 typedef struct Pixel{
-    unsigned char  b;
-    unsigned char  g;
-    unsigned char  r;
+    unsigned int b;
+    unsigned int g;
+    unsigned int r;
 } PIXEL;
 
 void printHist(char* colour, int* arr, int pxcount){
@@ -152,10 +152,9 @@ int main(int argc, char* argv[]){
     unsigned char header[54];
     fread(header, sizeof(unsigned char), 54, bmpfile);
     fwrite(header, sizeof(unsigned char), 54, out);
-    fseek(bmpfile, 0, SEEK_SET );
+    fseek(bmpfile, 0, SEEK_SET);
 
     // Read the bitmap file header
-    //fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, bmpfile);
     fread(&bitmapFileHeader.bfType, 2, 1, bmpfile);
     fread(&bitmapFileHeader.bfSize, 4, 1, bmpfile);
     fread(&bitmapFileHeader.bfReserved1, 2, 1, bmpfile);
@@ -163,7 +162,7 @@ int main(int argc, char* argv[]){
     fread(&bitmapFileHeader.bfOffBits, 4, 1, bmpfile);
 
     // Read the bitmap info header
-    fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER),1,bmpfile);
+    fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, bmpfile);
 
     // Print header information
     printFileHeader(bitmapFileHeader);
